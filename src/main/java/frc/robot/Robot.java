@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
  */
 public class Robot extends TimedRobot {
 
-    private final WPI_TalonFX falconMotor = new WPI_TalonFX(0);
+    private final WPI_TalonFX falconMotor = new WPI_TalonFX(1);
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -41,11 +41,11 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        falconMotor.set(0.3);
     }
 
     @Override
     public void teleopPeriodic() {
+        falconMotor.set(0.5);
     }
 
     @Override
