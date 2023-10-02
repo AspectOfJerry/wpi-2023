@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
@@ -16,8 +17,20 @@ import edu.wpi.first.wpilibj.TimedRobot;
  * update the build.gradle file in the project.
  */
 public class Robot extends TimedRobot {
+    // Constants
+    private final double kDeadzone = 0.05;
+    private final byte kXAxis = 0;
+    private final byte kYAxis = 1;
 
-    private final WPI_TalonFX falconMotor = new WPI_TalonFX(1);
+    private final WPI_TalonFX falconMaster = new WPI_TalonFX(1);
+    private final WPI_TalonFX falconFollower = new WPI_TalonFX(2);
+
+    /*
+     * Joystick ports
+     * Driver: 0
+     * Operator: 1
+     */
+    private final Joystick joystick = new Joystick(0);
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -25,6 +38,8 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotInit() {
+        falconMaster.setInverted(true);
+        falconFollower.follow(falconMaster);
     }
 
     @Override
@@ -45,7 +60,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        falconMotor.set(0.5);
+        // set motor with a joystick
+        falconMaster.set(Math.abs(joystick.getRawAxis(kYAxis)) <= kDeadzone ? 0 : joystick.getRawAxis(kYAxis));
     }
 
     @Override
