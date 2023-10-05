@@ -4,8 +4,13 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import java.util.ArrayList;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.music.Orchestra;
+
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 
@@ -18,12 +23,22 @@ import edu.wpi.first.wpilibj.TimedRobot;
  */
 public class Robot extends TimedRobot {
     // Constants
-    private final double kDeadzone = 0.05;
+    private final double kDeadzone = 0.1;
     private final byte kXAxis = 0;
     private final byte kYAxis = 1;
+    private final byte kLeftTriggerAxis = 2;
+    private final byte kRightTriggerAxis = 3;
 
-    private final WPI_TalonFX falconMaster = new WPI_TalonFX(1);
-    private final WPI_TalonFX falconFollower = new WPI_TalonFX(2);
+    private final byte kAButton = 1;
+
+    private final WPI_TalonFX motor1 = new WPI_TalonFX(1);
+    private final WPI_TalonFX motor2 = new WPI_TalonFX(2);
+
+    private final DigitalInput button = new DigitalInput(5);
+
+    private Orchestra orchestra;
+
+    private boolean AButtonState = false;
 
     /*
      * Joystick ports
@@ -38,8 +53,15 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotInit() {
-        falconMaster.setInverted(true);
-        falconFollower.follow(falconMaster);
+        // motor1.setInverted(true);
+        // motor2.follow(falconMaster);
+
+        ArrayList<TalonFX> instruments = new ArrayList<TalonFX>();
+        instruments.add(motor1);
+        instruments.add(motor2);
+
+        orchestra = new Orchestra(instruments);
+        orchestra.loadMusic(".\\assets\\music.chrp");
     }
 
     @Override
@@ -56,12 +78,24 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        orchestra.play();
     }
 
     @Override
     public void teleopPeriodic() {
+        if (joystick.getRawButtonPressed(kAButton)) {
+            AButtonState = !AButtonState;
+        }
+
+        double leftJoystickPosX = joystick.getRawAxis(kXAxis);
+        double leftJoystickPosY = -joystick.getRawAxis(kYAxis);
+        double leftTrigger = joystick.getRawAxis(kLeftTriggerAxis);
+        double rightTrigger = joystick.getRawAxis(kRightTriggerAxis);
+
         // set motor with a joystick
-        falconMaster.set(Math.abs(joystick.getRawAxis(kYAxis)) <= kDeadzone ? 0 : joystick.getRawAxis(kYAxis));
+        motor1.set(Math.abs(leftJoystickPosY) <= kDeadzone ? 0 : joystick.getRawAxis(kYAxis));
+
+        boolean buttonPressed = button.get();
     }
 
     @Override
