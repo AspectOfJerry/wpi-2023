@@ -5,6 +5,8 @@
 package frc.robot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -36,7 +38,7 @@ public class Robot extends TimedRobot {
 
     private final DigitalInput button = new DigitalInput(5);
 
-    private Orchestra orchestra;
+    private Orchestra orchestra = new Orchestra(List.of(motor1, motor2), "./assets/music.chrp");
 
     private boolean AButtonState = false;
 
@@ -56,11 +58,6 @@ public class Robot extends TimedRobot {
         // motor1.setInverted(true);
         // motor2.follow(falconMaster);
 
-        ArrayList<TalonFX> instruments = new ArrayList<TalonFX>();
-        instruments.add(motor1);
-        instruments.add(motor2);
-
-        orchestra = new Orchestra(instruments);
         orchestra.loadMusic(".\\assets\\music.chrp");
     }
 
@@ -87,10 +84,7 @@ public class Robot extends TimedRobot {
             AButtonState = !AButtonState;
         }
 
-        double leftJoystickPosX = joystick.getRawAxis(kXAxis);
         double leftJoystickPosY = -joystick.getRawAxis(kYAxis);
-        double leftTrigger = joystick.getRawAxis(kLeftTriggerAxis);
-        double rightTrigger = joystick.getRawAxis(kRightTriggerAxis);
 
         // set motor with a joystick
         motor1.set(Math.abs(leftJoystickPosY) <= kDeadzone ? 0 : joystick.getRawAxis(kYAxis));
