@@ -11,6 +11,8 @@ import java.util.List;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.music.Orchestra;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
@@ -26,21 +28,17 @@ import edu.wpi.first.wpilibj.TimedRobot;
 public class Robot extends TimedRobot {
     // Constants
     private final double kDeadzone = 0.1;
-    private final byte kXAxis = 0;
-    private final byte kYAxis = 1;
-    private final byte kLeftTriggerAxis = 2;
-    private final byte kRightTriggerAxis = 3;
+    private final byte kLeftXAxis = 0;
+    private final byte kLeftYAxis = 1;
 
-    private final byte kAButton = 1;
+    private CANSparkMax motorMaster = new CANSparkMax(11, MotorType.kBrushless);
+    private CANSparkMax motorFollower = new CANSparkMax(12, MotorType.kBrushless);
 
-    private final WPI_TalonFX motor1 = new WPI_TalonFX(1);
-    private final WPI_TalonFX motor2 = new WPI_TalonFX(2);
+    // private final WPI_TalonFX motor1 = new WPI_TalonFX(1);
+    // private final WPI_TalonFX motor2 = new WPI_TalonFX(2);
 
-    private final DigitalInput button = new DigitalInput(5);
-
-    private Orchestra orchestra = new Orchestra(List.of(motor1, motor2), "./assets/music.chrp");
-
-    private boolean AButtonState = false;
+    // private Orchestra orchestra = new Orchestra(List.of(motor1, motor2),
+    // "./assets/music.chrp");
 
     /*
      * Joystick ports
@@ -55,10 +53,10 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotInit() {
-        // motor1.setInverted(true);
-        // motor2.follow(falconMaster);
+        // orchestra.loadMusic(".\\assets\\music.chrp");
 
-        orchestra.loadMusic(".\\assets\\music.chrp");
+        motorFollower.follow(motorMaster);
+        motorFollower.setInverted(true);
     }
 
     @Override
@@ -75,21 +73,13 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        orchestra.play();
+        // orchestra.play();
+
+        motorMaster.set(Math.abs(joystick.getRawAxis(kLeftYAxis) > kDeadzone ? joystick.getRawAxis(kLeftYAxis) : 0));
     }
 
     @Override
     public void teleopPeriodic() {
-        if (joystick.getRawButtonPressed(kAButton)) {
-            AButtonState = !AButtonState;
-        }
-
-        double leftJoystickPosY = -joystick.getRawAxis(kYAxis);
-
-        // set motor with a joystick
-        motor1.set(Math.abs(leftJoystickPosY) <= kDeadzone ? 0 : joystick.getRawAxis(kYAxis));
-
-        boolean buttonPressed = button.get();
     }
 
     @Override
